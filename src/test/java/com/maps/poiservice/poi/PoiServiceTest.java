@@ -17,6 +17,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,13 +54,15 @@ public class PoiServiceTest {
     @BeforeEach
     public void setUp() throws JsonProcessingException {
         when(zoneService.getZone(LATITUDE, LONGITUDE)).thenReturn(ZONE);
-        when(objectMapper.readValue(eq(POIS_AS_JSON), any(TypeReference.class))).thenReturn(EXPECTED_POIS);
         when(valueOperations.get(ZONE.name())).thenReturn(POIS_AS_JSON);
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
     }
 
     @Test
     public void shouldReturnFilteredPois() throws Exception {
+        // given
+        when(objectMapper.readValue(eq(POIS_AS_JSON), any(TypeReference.class))).thenReturn(EXPECTED_POIS);
+
         // when
         List<PointOfInterest> actualPois = poiService.getPois(LATITUDE, LONGITUDE, POI_TYPE);
 
@@ -71,11 +74,26 @@ public class PoiServiceTest {
 
     @Test
     public void shouldReturnAllPois() throws Exception {
+        // given
+        when(objectMapper.readValue(eq(POIS_AS_JSON), any(TypeReference.class))).thenReturn(EXPECTED_POIS);
+
         // when
         List<PointOfInterest> actualPois = poiService.getPois(LATITUDE, LONGITUDE, null);
 
         // then
         assertThat(actualPois).hasSameElementsAs(EXPECTED_POIS);
+    }
+
+    @Test
+    public void shouldReturnEmptyPoisList() throws Exception {
+        // given
+        when(objectMapper.readValue(eq(POIS_AS_JSON), any(TypeReference.class))).thenReturn(Collections.emptyList());
+
+        // when
+        List<PointOfInterest> actualPois = poiService.getPois(LATITUDE, LONGITUDE, null);
+
+        // then
+        assertThat(actualPois).isEmpty();
     }
 
     private static List<PointOfInterest> createMockPois() {
