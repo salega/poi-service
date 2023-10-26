@@ -1,6 +1,6 @@
 package com.maps.poiservice.zone;
 
-import com.maps.poiservice.model.zone.NoZoneFoundException;
+import com.maps.poiservice.exception.NoZoneFoundException;
 import com.maps.poiservice.model.zone.Zone;
 import org.springframework.stereotype.Component;
 

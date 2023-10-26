@@ -8,8 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -29,19 +29,19 @@ public class PoiControllerTest {
         double latitude = 40.0;
         double longitude = 50.0;
         PointOfInterestType poiType = PointOfInterestType.RESTAURANT;
-        List<PointOfInterest> expectedPois = createMockPois();
+        Set<PointOfInterest> expectedPois = createMockPois();
         when(poiService.getPois(latitude, longitude, poiType)).thenReturn(expectedPois);
 
         // when
-        List<PointOfInterest> actualPois = poiController.getPois(latitude, longitude, poiType);
+        Set<PointOfInterest> actualPois = poiController.getPois(latitude, longitude, poiType);
 
         // then
         assertEquals(expectedPois, actualPois);
     }
 
-    public List<PointOfInterest> createMockPois() {
-        List<PointOfInterest> pois = new ArrayList<>();
-        pois.add(new PointOfInterest("Some restaurant", PointOfInterestType.RESTAURANT));
+    public Set<PointOfInterest> createMockPois() {
+        Set<PointOfInterest> pois = new HashSet<>();
+        pois.add(new PointOfInterest(1, "Some restaurant", PointOfInterestType.RESTAURANT));
         return pois;
     }
 }

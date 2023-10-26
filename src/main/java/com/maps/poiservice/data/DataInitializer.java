@@ -8,9 +8,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.maps.poiservice.model.poi.PointOfInterestType.*;
 
@@ -31,29 +32,29 @@ public class DataInitializer implements CommandLineRunner {
         List<Zone> zones = Arrays.asList(Zone.PARIS, Zone.NEW_YORK);
 
         for (Zone zone : zones) {
-            List<PointOfInterest> pointsOfInterest = generateSamplePointsOfInterest(zone);
+            Set<PointOfInterest> pointsOfInterest = generateSamplePointsOfInterest(zone);
             String jsonPointsOfInterest = convertListToJson(pointsOfInterest);
             redisTemplate.opsForValue().set(zone.name(), jsonPointsOfInterest);
         }
     }
 
-    private List<PointOfInterest> generateSamplePointsOfInterest(Zone zone) {
-        List<PointOfInterest> pointsOfInterest = new ArrayList<>();
+    private Set<PointOfInterest> generateSamplePointsOfInterest(Zone zone) {
+        Set<PointOfInterest> pointsOfInterest = new HashSet<>();
         if (zone == Zone.PARIS) {
-            pointsOfInterest.add(new PointOfInterest("Eiffel Tower", TOURIST_ATTRACTION));
-            pointsOfInterest.add(new PointOfInterest("Louvre Museum", MUSEUM));
-            pointsOfInterest.add(new PointOfInterest("Some fancy restaurant", RESTAURANT));
-            pointsOfInterest.add(new PointOfInterest("Notre-Dame Cathedral", TOURIST_ATTRACTION));
+            pointsOfInterest.add(new PointOfInterest(1, "Eiffel Tower", TOURIST_ATTRACTION));
+            pointsOfInterest.add(new PointOfInterest(2, "Louvre Museum", MUSEUM));
+            pointsOfInterest.add(new PointOfInterest(3, "Some fancy restaurant", RESTAURANT));
+            pointsOfInterest.add(new PointOfInterest(4, "Notre-Dame Cathedral", TOURIST_ATTRACTION));
         } else if (zone == Zone.NEW_YORK) {
-            pointsOfInterest.add(new PointOfInterest("Statue of Liberty", TOURIST_ATTRACTION));
-            pointsOfInterest.add(new PointOfInterest("Central Park", PARK));
-            pointsOfInterest.add(new PointOfInterest("Times Square", TOURIST_ATTRACTION));
+            pointsOfInterest.add(new PointOfInterest(5, "Statue of Liberty", TOURIST_ATTRACTION));
+            pointsOfInterest.add(new PointOfInterest(6, "Central Park", PARK));
+            pointsOfInterest.add(new PointOfInterest(7, "Times Square", TOURIST_ATTRACTION));
         }
 
         return pointsOfInterest;
     }
 
-    private String convertListToJson(List<PointOfInterest> pointsOfInterest) throws JsonProcessingException {
+    private String convertListToJson(Set<PointOfInterest> pointsOfInterest) throws JsonProcessingException {
         return objectMapper.writeValueAsString(pointsOfInterest);
     }
 }

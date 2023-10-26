@@ -14,7 +14,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -33,11 +33,11 @@ public class PoiService {
     }
 
     @GetMapping
-    public List<PointOfInterest> getPois(double latitude, double longitude, PointOfInterestType poiType) throws JsonProcessingException {
+    public Set<PointOfInterest> getPois(double latitude, double longitude, PointOfInterestType poiType) throws JsonProcessingException {
         Zone zone = zoneService.getZone(latitude, longitude);
         logger.info("Found zoneId={} for latitude={} and longitude={}", zone, latitude, longitude);
         String poisJson = (String) redisTemplate.opsForValue().get(zone.name());
-        List<PointOfInterest> pois = objectMapper.readValue(poisJson, new TypeReference<>() {
+        Set<PointOfInterest> pois = objectMapper.readValue(poisJson, new TypeReference<>() {
         });
 
         if (poiType == null) {
@@ -47,9 +47,9 @@ public class PoiService {
         }
     }
 
-    private List<PointOfInterest> filterPoisByType(List<PointOfInterest> pois, PointOfInterestType poiType) {
+    private Set<PointOfInterest> filterPoisByType(Set<PointOfInterest> pois, PointOfInterestType poiType) {
         return pois.stream()
                 .filter(poi -> poi.getType() == poiType)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 }

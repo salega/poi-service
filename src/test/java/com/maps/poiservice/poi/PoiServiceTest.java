@@ -1,6 +1,5 @@
 package com.maps.poiservice.poi;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maps.poiservice.model.poi.PointOfInterest;
@@ -16,9 +15,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,7 +33,7 @@ public class PoiServiceTest {
     private static final Zone ZONE = Zone.PARIS;
     private static final String POIS_AS_JSON = "poisAsJson";
     private static final PointOfInterestType POI_TYPE = PointOfInterestType.RESTAURANT;
-    private static final List<PointOfInterest> EXPECTED_POIS = createMockPois();
+    private static final Set<PointOfInterest> EXPECTED_POIS = createMockPois();
 
     @Mock
     private ZoneService zoneService;
@@ -52,7 +51,7 @@ public class PoiServiceTest {
     private PoiService poiService;
 
     @BeforeEach
-    public void setUp() throws JsonProcessingException {
+    public void setUp() {
         when(zoneService.getZone(LATITUDE, LONGITUDE)).thenReturn(ZONE);
         when(valueOperations.get(ZONE.name())).thenReturn(POIS_AS_JSON);
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
@@ -64,12 +63,12 @@ public class PoiServiceTest {
         when(objectMapper.readValue(eq(POIS_AS_JSON), any(TypeReference.class))).thenReturn(EXPECTED_POIS);
 
         // when
-        List<PointOfInterest> actualPois = poiService.getPois(LATITUDE, LONGITUDE, POI_TYPE);
+        Set<PointOfInterest> actualPois = poiService.getPois(LATITUDE, LONGITUDE, POI_TYPE);
 
         // then
         assertEquals(1, actualPois.size());
-        PointOfInterest expectedPoi = new PointOfInterest("Some restaurant", PointOfInterestType.RESTAURANT);
-        assertEquals(expectedPoi, actualPois.get(0));
+        PointOfInterest expectedPoi = new PointOfInterest(1, "Some restaurant", PointOfInterestType.RESTAURANT);
+        assertEquals(expectedPoi, actualPois.iterator().next());
     }
 
     @Test
@@ -78,28 +77,28 @@ public class PoiServiceTest {
         when(objectMapper.readValue(eq(POIS_AS_JSON), any(TypeReference.class))).thenReturn(EXPECTED_POIS);
 
         // when
-        List<PointOfInterest> actualPois = poiService.getPois(LATITUDE, LONGITUDE, null);
+        Set<PointOfInterest> actualPois = poiService.getPois(LATITUDE, LONGITUDE, null);
 
         // then
         assertThat(actualPois).hasSameElementsAs(EXPECTED_POIS);
     }
 
     @Test
-    public void shouldReturnEmptyPoisList() throws Exception {
+    public void shouldReturnEmptyPoisSet() throws Exception {
         // given
-        when(objectMapper.readValue(eq(POIS_AS_JSON), any(TypeReference.class))).thenReturn(Collections.emptyList());
+        when(objectMapper.readValue(eq(POIS_AS_JSON), any(TypeReference.class))).thenReturn(Collections.emptySet());
 
         // when
-        List<PointOfInterest> actualPois = poiService.getPois(LATITUDE, LONGITUDE, null);
+        Set<PointOfInterest> actualPois = poiService.getPois(LATITUDE, LONGITUDE, null);
 
         // then
         assertThat(actualPois).isEmpty();
     }
 
-    private static List<PointOfInterest> createMockPois() {
-        List<PointOfInterest> pois = new ArrayList<>();
-        pois.add(new PointOfInterest("Some restaurant", PointOfInterestType.RESTAURANT));
-        pois.add(new PointOfInterest("Some museum", PointOfInterestType.MUSEUM));
+    private static Set<PointOfInterest> createMockPois() {
+        Set<PointOfInterest> pois = new HashSet<>();
+        pois.add(new PointOfInterest(1, "Some restaurant", PointOfInterestType.RESTAURANT));
+        pois.add(new PointOfInterest(2, "Some museum", PointOfInterestType.MUSEUM));
         return pois;
     }
 }

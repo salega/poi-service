@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Set;
 
 @RestController
 @Validated
@@ -30,12 +30,12 @@ public class PoiController {
 
     // validate input parameters and return 400 if invalid
     @GetMapping
-    public List<PointOfInterest> getPois(@RequestParam double latitude,
-                                         @RequestParam double longitude,
-                                         @RequestParam(required = false) PointOfInterestType poiType)
+    public Set<PointOfInterest> getPois(@RequestParam double latitude,
+                                        @RequestParam double longitude,
+                                        @RequestParam(required = false) PointOfInterestType poiType)
             throws JsonProcessingException {
         logger.info("Called getPois endpoint for latitude={}, longitude={}, poiType={}", latitude, longitude, poiType);
-        List<PointOfInterest> pois = poiService.getPois(latitude, longitude, poiType);
+        Set<PointOfInterest> pois = poiService.getPois(latitude, longitude, poiType);
         logger.info("Found the following points of interest: {}", pois);
 
         return pois;
